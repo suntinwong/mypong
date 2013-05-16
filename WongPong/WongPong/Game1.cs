@@ -20,6 +20,12 @@ namespace WongPong {
         Player player2 = new Player(2); //make player2
         Ball ball = new Ball();         //make the ball
 
+        //other axullairy stuff
+        bool p1hit = false;
+        bool p2hit = false;
+        int hittimer = 0;
+        bool pauseOn = false;
+
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -58,7 +64,8 @@ namespace WongPong {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed) this.Exit();
             player1.Update(gameTime);    //update the player 1
             player2.Update(gameTime);    //update player 2
-            ball.Update(gameTime);       //update the ball
+            ball.Update(gameTime,Content,pauseOn);       //update the ball
+            manage_collisions();         //do collision logic
             base.Update(gameTime);      //update the gametime
         }
 
@@ -69,8 +76,8 @@ namespace WongPong {
             //do all drawings here
             spriteBatch.Begin();
 
-            player1.Draw(spriteBatch); //draw the players
-            player2.Draw(spriteBatch); //draw the players
+            player1.Draw(spriteBatch,p1hit); //draw the players
+            player2.Draw(spriteBatch,p2hit); //draw the players
             ball.Draw(spriteBatch); //draw the ball
 
             spriteBatch.End(); 
@@ -81,6 +88,31 @@ namespace WongPong {
         ////////////////////////////////////////////////////
         /////////////// Helper functions ///////////////////
         ////////////////////////////////////////////////////
+
+        //function that manages all collisions between objects
+        private void manage_collisions() {
+
+            hittimer++;
+
+            if (p1hit && hittimer > 10) p1hit = false;
+            if (p2hit && hittimer > 10) p2hit = false;
+            
+            //ball collides with player #1
+            if (ball.boundingBox.Intersects(player1.boundingBox)) {
+                ball.velocity.X *= -1; ball.velocity.X += 20;
+                ball.velocity.Y *= 1;
+                ball.directionRight = -1;
+                p1hit = true; hittimer = 0;
+            }
+
+            //ball collides with player #2
+            if (ball.boundingBox.Intersects(player2.boundingBox)) {
+                ball.velocity.X *= -1; ball.velocity.X -= 20;
+                ball.velocity.Y *= 1;
+                ball.directionRight = 1;
+                p2hit = true; hittimer = 0;
+            }
+        }
 
 
     }

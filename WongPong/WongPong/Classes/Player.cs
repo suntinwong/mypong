@@ -14,11 +14,13 @@ namespace WongPong {
     //Ball class
     public class Player {
 
-        public Texture2D texture; //Player's texture
-        public Vector2 position; //position of Player in the game world
+        public Texture2D texture;     //Player's texture
+        public Vector2 position;      //position of Player in the game world
         public Rectangle boundingBox; //bounding box used for collision
-        public int moveSpeed; //Player's move speed
-        private int type;       //player's type # (player 1 or player 2?)
+        public int moveSpeed;        //Player's move max speed
+        public int velocity;        //player's current velocity
+        public int score;            //player's score
+        private int type;            //player's type # (player 1 or player 2?)
         private Kinect kinect;
 
         //Constructor
@@ -26,10 +28,11 @@ namespace WongPong {
 
             //set important attributes
             moveSpeed = 10;
-
-
+            
             //other attributes
+            velocity = 0;
             type = newtype;
+            score = 0;
             kinect = new Kinect();  //Make kinect object
 
         }
@@ -52,14 +55,14 @@ namespace WongPong {
             }
         }
 
-        //Udate method
+        //Update method
         public void Update(GameTime gametime) {
 
-            //update boundingBox
+            //update boundingBox & other thigns
             boundingBox.X = (int)position.X; boundingBox.Y = (int)position.Y;
-
             bool moveUp = false;
             bool moveDown = false;
+            velocity = 0;
 
             //When we're using mice and keyboard (no kinect controls)
             if (!Defualt.Default.UsingKinect) {
@@ -68,7 +71,6 @@ namespace WongPong {
                 if (type == 1 && keystate.IsKeyDown(Keys.S)) moveDown = true;
                 if (type == 2 && keystate.IsKeyDown(Keys.Up)) moveUp = true;
                 if (type == 2 && keystate.IsKeyDown(Keys.Down)) moveDown = true; 
-
             }
 
             //When kinect is enabled (only use kinect controls)
@@ -78,20 +80,18 @@ namespace WongPong {
                 if (kinect.player == null) return;
             }
 
-
             //Move player if applicable & keep them on screen
-            if (moveUp) position.Y -= moveSpeed;
-            if (moveDown) position.Y += moveSpeed;
+            if (moveUp)  {position.Y -= moveSpeed; velocity = moveSpeed * -1; }
+            if (moveDown) {position.Y += moveSpeed; velocity = moveSpeed;}
             if (position.Y <= 0) position.Y = 0;
             if (position.Y >= Defualt.Default._H - texture.Height) position.Y = Defualt.Default._H - texture.Height;
             
         }
 
         //draw method
-        public void Draw(SpriteBatch spritebatch) {
-            spritebatch.Draw(texture, position, Color.White);
+        public void Draw(SpriteBatch spritebatch,bool hit = false) {
+            if (!hit) spritebatch.Draw(texture, position, Color.White);
+            else spritebatch.Draw(texture, position, Color.Gold);
         }
     }
-
-
 }
