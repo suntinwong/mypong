@@ -15,9 +15,19 @@ namespace WongPong {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        //Objects
+        Ball ball = new Ball();
+
+
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            //Set some basic stuff for my game
+            graphics.IsFullScreen = false; //set it to full screen no
+            graphics.PreferredBackBufferWidth = Defualt.Default._W; //set the screen dimension width
+            graphics.PreferredBackBufferHeight = Defualt.Default._H; //set the screen dimension height
+            this.Window.Title = "WongPong"; //set window title
         }
 
        //Initialize Function
@@ -31,30 +41,34 @@ namespace WongPong {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+
+            ball.LoadContent(Content); //load the ball
         }
 
         //Unload Content Method
         protected override void UnloadContent() {
-            // TODO: Unload any non ContentManager content here
+             
         }
 
         //Update Method
         protected override void Update(GameTime gameTime) {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-
-            // TODO: Add your update logic here
-
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed) this.Exit();
+            ball.Update(gameTime); //update the ball
             base.Update(gameTime);
         }
 
         //Draw Method
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
-            // TODO: Add your drawing code here
+            //do all drawings here
+            spriteBatch.Begin(); 
 
+            
+            ball.Draw(spriteBatch); //draw the ball
+
+            spriteBatch.End(); 
             base.Draw(gameTime);
         }
     }
