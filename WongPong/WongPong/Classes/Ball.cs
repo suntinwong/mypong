@@ -24,7 +24,7 @@ namespace WongPong {
 
             //set the starting position & starting velocity
             position = new Vector2(Defualt.Default._W / 2, Defualt.Default._H/2);
-            velocity = new Vector2(rand.Next(-30, 30)/10, rand.Next(10,40)/10 );
+            velocity = new Vector2(rand.Next(30, 60)/10, rand.Next(-30,30)/10 );
             
         }
 
@@ -39,12 +39,13 @@ namespace WongPong {
         //update method
         public void Update(GameTime gametime) {
 
-            //Move the ball
+            //Move the ball && update bounding box
             position.X += velocity.X; position.Y += velocity.Y;
+            boundingBox.X = (int)position.X; boundingBox.Y = (int)position.Y;
 
             //Check wall coliisions and act accordingly
-            if (position.X > Defualt.Default._W - texture.Width|| position.X < 0) {velocity.X *= -1};
-            if (position.Y > Defualt.Default._H - texture.Height || position.Y < 0) {velocity.Y *= -1};
+            if (position.X > Defualt.Default._W - texture.Width|| position.X < 0) {velocity.X *= -1;}
+            if (position.Y > Defualt.Default._H - texture.Height || position.Y < 0) { velocity.Y *= -1; }
         }
 
         //draw method

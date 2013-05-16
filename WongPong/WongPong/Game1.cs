@@ -16,8 +16,9 @@ namespace WongPong {
         SpriteBatch spriteBatch;
 
         //Objects
-        Ball ball = new Ball();
-
+        Player player1 = new Player(1); //make player1
+        Player player2 = new Player(2); //make player2
+        Ball ball = new Ball();         //make the ball
 
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
@@ -41,8 +42,9 @@ namespace WongPong {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-
-            ball.LoadContent(Content); //load the ball
+            player1.LoadContent(Content);    //load player 1
+            player2.LoadContent(Content);   //load player 2
+            ball.LoadContent(Content);      //load the ball
         }
 
         //Unload Content Method
@@ -54,8 +56,10 @@ namespace WongPong {
         protected override void Update(GameTime gameTime) {
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed) this.Exit();
-            ball.Update(gameTime); //update the ball
-            base.Update(gameTime);
+            player1.Update(gameTime);    //update the player 1
+            player2.Update(gameTime);    //update player 2
+            ball.Update(gameTime);       //update the ball
+            base.Update(gameTime);      //update the gametime
         }
 
         //Draw Method
@@ -63,13 +67,21 @@ namespace WongPong {
             GraphicsDevice.Clear(Color.White);
 
             //do all drawings here
-            spriteBatch.Begin(); 
+            spriteBatch.Begin();
 
-            
+            player1.Draw(spriteBatch); //draw the players
+            player2.Draw(spriteBatch); //draw the players
             ball.Draw(spriteBatch); //draw the ball
 
             spriteBatch.End(); 
             base.Draw(gameTime);
         }
+
+
+        ////////////////////////////////////////////////////
+        /////////////// Helper functions ///////////////////
+        ////////////////////////////////////////////////////
+
+
     }
 }

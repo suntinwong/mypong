@@ -25,7 +25,7 @@ namespace WongPong {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("725")]
+        [global::System.Configuration.DefaultSettingValueAttribute("800")]
         public int _W {
             get {
                 return ((int)(this["_W"]));
@@ -44,6 +44,18 @@ namespace WongPong {
             }
             set {
                 this["_H"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UsingKinect {
+            get {
+                return ((bool)(this["UsingKinect"]));
+            }
+            set {
+                this["UsingKinect"] = value;
             }
         }
     }
