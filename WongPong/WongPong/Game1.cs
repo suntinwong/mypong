@@ -23,6 +23,7 @@ namespace WongPong {
         //other axullairy stuff
         bool p1hit = false;
         bool p2hit = false;
+        bool ballhit = false;
         int hittimer = 0;
         bool pauseOn = false;
 
@@ -67,6 +68,7 @@ namespace WongPong {
             ball.Update(gameTime,Content,pauseOn);       //update the ball
             manage_collisions();         //do collision logic
             Score_Check();              //check & update scores
+            do_animations(gameTime);    //do all game animations
             base.Update(gameTime);      //update the gametime
         }
 
@@ -79,7 +81,7 @@ namespace WongPong {
 
             player1.Draw(spriteBatch,p1hit); //draw the players
             player2.Draw(spriteBatch,p2hit); //draw the players
-            ball.Draw(spriteBatch); //draw the ball
+            ball.Draw(spriteBatch,ballhit); //draw the ball
 
             spriteBatch.End(); 
             base.Draw(gameTime);
@@ -97,13 +99,15 @@ namespace WongPong {
             Random rand = new Random();
             if (p1hit && hittimer > 10) p1hit = false;
             if (p2hit && hittimer > 10) p2hit = false;
+            if (ballhit && hittimer > 10) ballhit = false;
             
             //ball collides with player #1
             if (ball.boundingBox.Intersects(player1.boundingBox)) {
                 ball.velocity.X  = rand.Next(4,8); ball.velocity.X += player1.velocity/3;
                 if (ball.velocity.Y > 0) ball.velocity.Y -= 2;
-                ball.velocity.Y += player1.velocity/3; 
-                p1hit = true; hittimer = 0;
+                ball.velocity.Y += player1.velocity/3;
+                p1hit = true; ballhit = true; hittimer = 0;
+                ball.PaddleHit();
             }
 
             //ball collides with player #2
@@ -111,8 +115,19 @@ namespace WongPong {
                 ball.velocity.X = rand.Next(-8,-4); ball.velocity.X -= player2.velocity / 3;
                 if (ball.velocity.Y > 0) ball.velocity.Y-= 2;
                 ball.velocity.Y += player2.velocity/3;
-                p2hit = true; hittimer = 0;
+                p2hit = true; ballhit = true;  hittimer = 0;
+                ball.PaddleHit();
             }
+        }
+
+        //function that does all additional animation
+        private void do_animations(GameTime gameTime) {
+
+            //Paddle scaling when hit
+            if (p2hit & hittimer < 5) player2.scale = linear_tween((float)hittimer / 5f, 1, 1.4f);
+            else if (p2hit) player2.scale = linear_tween((float)(hittimer-5)/5f, 1.4f, 1);
+            if (p1hit & hittimer < 5) player1.scale = linear_tween((float)hittimer / 5f, 1, 1.4f);
+            else if (p1hit) player1.scale = linear_tween((float)(hittimer - 5) / 5f, 1.4f, 1);
         }
 
         //function that checks if ball hits score line
@@ -135,6 +150,12 @@ namespace WongPong {
                 ball.Reset();
             }
 
+        }
+
+        //helper linear tweeining animation
+        private float linear_tween(float t, float start, float end) {
+            if (t > 1.0f) return end;
+            return t * end + (1.0f - t) * start;
         }
 
 

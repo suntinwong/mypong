@@ -19,6 +19,7 @@ namespace WongPong {
         public bool isVisible;    //if the ball is visible and to be rendered
         private Vector2 maxVelocity; //max velocity of the ball (x/y movement)
         public int maxParticleLife; //life of each generated particles
+        public float scale;         //object's scale
         public List<Particle> particles;
 
         //Constructor
@@ -27,13 +28,14 @@ namespace WongPong {
 
             //Set important attributes
             maxParticleLife = 20;
-            position = new Vector2(Defualt.Default._W / 5, Defualt.Default._H / 2);
+            position = new Vector2(Defualt.Default._W / 10, Defualt.Default._H / 2);
             velocity = new Vector2(5, 0);
             maxVelocity = new Vector2(12, 12);
             
             //set other stuff
             isVisible = true;
             particles = new List<Particle>();
+            scale = 1.0f;
             
         }
 
@@ -86,21 +88,48 @@ namespace WongPong {
         }
 
         //draw method
-        public void Draw(SpriteBatch spritebatch) {
+        public void Draw(SpriteBatch spritebatch,bool hit) {
 
-            //draw the ball
-            if(isVisible) spritebatch.Draw(texture, position, Color.Yellow);
+            //draw the ball & particles
+            Color c = Color.Yellow;
+            if (hit) c = Color.White;
+            if(isVisible) spritebatch.Draw(texture, position, null, c,0f,new Vector2(0,0), scale, SpriteEffects.None, 0f);
 
-            //draw all particles
-            for (int i = 0; i < particles.Count(); i++) particles[i].Draw(spritebatch);
+            for (int i = 0; i < particles.Count(); i++) {
+                if (!hit) particles[i].color = Color.Yellow;
+                else particles[i].color = Color.White;
+                particles[i].Draw(spritebatch);
+            }
+            
         }
+
+        //Paddle hit, make particle effect
+        public void PaddleHit() {
+
+            //Figure out if it was right or left paddle
+            int xMax, xMin;
+            if (position.X > Defualt.Default._W / 2) { xMax = 0; xMin = -10; }
+            else { xMax = 10; xMin = 0; }
+
+            //make directional small explision
+            Random rand = new Random();
+            for (int i = 0; i < 10; i++) {
+                Particle p = new Particle(particleTexture,
+                    (int)position.X, (int)position.Y,
+                    new Vector2(rand.Next(xMin,xMax) / 10f, rand.Next(-5, 5) / 10f),
+                    Color.White);
+                p.life = -100;
+                particles.Add(p);
+            }
+        }
+
 
         //destroy the ball at current location, make particle effect
         public void Kill() {
             
             //Make explision
             Random rand = new Random();
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < 100; i++) {
                 Particle p = new Particle(particleTexture,
                     (int)position.X,(int)position.Y,
                     new Vector2(rand.Next(-1000,1000)/100f,rand.Next(-1000,1000)/100f),
@@ -121,7 +150,7 @@ namespace WongPong {
         public void Reset() {
             particles.Clear();
             isVisible = true;
-            position = new Vector2(Defualt.Default._W / 5, Defualt.Default._H / 2);
+            position = new Vector2(Defualt.Default._W / 10, Defualt.Default._H / 2);
             velocity = new Vector2(5, 0);
         }
     }
