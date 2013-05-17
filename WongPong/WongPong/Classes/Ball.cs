@@ -12,7 +12,7 @@ namespace WongPong {
 
         public Texture2D texture; //ball's texture
         private Texture2D particleTexture; //particles' texture
-        public Vector2 position; //position of ball in the game world
+        public Vector2 position,origin; //position of ball in the game world
         public Rectangle boundingBox; //bounding box used for collision
         public Vector2 velocity; //velocity of ball (x/y movement)
         public int directionRight; //if ball is suppose to move right
@@ -45,7 +45,8 @@ namespace WongPong {
             //set the texture & bounding box
             texture = content.Load<Texture2D>("Artwork/ball");
             particleTexture = content.Load<Texture2D>("Artwork/ball_particle");
-            boundingBox = new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height); 
+            boundingBox = new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height);
+            origin.X = (texture.Width / 2); origin.Y = (texture.Height / 2);
         }
 
         //update method
@@ -93,7 +94,7 @@ namespace WongPong {
             //draw the ball & particles
             Color c = Color.Yellow;
             if (hit) c = Color.White;
-            if(isVisible) spritebatch.Draw(texture, position, null, c,0f,new Vector2(0,0), scale, SpriteEffects.None, 0f);
+            if(isVisible) spritebatch.Draw(texture, position+origin, null, c,0f,origin, scale, SpriteEffects.None, 0f);
 
             for (int i = 0; i < particles.Count(); i++) {
                 if (!hit) particles[i].color = Color.Yellow;

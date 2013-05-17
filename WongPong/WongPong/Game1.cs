@@ -25,8 +25,14 @@ namespace WongPong {
         bool p1hit = false;
         bool p2hit = false;
         bool ballhit = false;
+        bool p2JustScored = false;
+        bool p1JustScored = false;
+
+        //timers
         int hittimer = 0;
-        bool pauseOn = false;
+        int roundtimer = 0;
+        int justscoredtimer = 0;
+        bool pauseOn = true;
 
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
@@ -66,11 +72,13 @@ namespace WongPong {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed) this.Exit();
             player1.Update(gameTime);    //update the player 1
             player2.Update(gameTime);    //update player 2
-            hud.Update(gameTime);        //update the hud
             ball.Update(gameTime,Content,pauseOn);       //update the ball
             manage_collisions();         //do collision logic
             Score_Check();              //check & update scores
+            hud.Update(gameTime);        //update the hud
             do_animations(gameTime);    //do all game animations
+
+            hittimer++; roundtimer++; justscoredtimer++;
             base.Update(gameTime);      //update the gametime
         }
 
@@ -97,7 +105,7 @@ namespace WongPong {
         //function that manages all collisions between objects
         private void manage_collisions() {
 
-            hittimer++;
+            
             Random rand = new Random();
             if (p1hit && hittimer > 10) p1hit = false;
             if (p2hit && hittimer > 10) p2hit = false;
@@ -126,10 +134,30 @@ namespace WongPong {
         private void do_animations(GameTime gameTime) {
 
             //Paddle scaling when hit
-            if (p2hit & hittimer < 5) player2.scale = linear_tween((float)hittimer / 5f, 1, 1.4f);
-            else if (p2hit) player2.scale = linear_tween((float)(hittimer-5)/5f, 1.4f, 1);
-            if (p1hit & hittimer < 5) player1.scale = linear_tween((float)hittimer / 5f, 1, 1.4f);
-            else if (p1hit) player1.scale = linear_tween((float)(hittimer - 5) / 5f, 1.4f, 1);
+            if (p2hit & hittimer < 5) player2.scale = linear_tween((float)hittimer / 5f, 1, 1.5f);
+            else if (p2hit) player2.scale = linear_tween((float)(hittimer-5)/5f, 1.5f, 1);
+            if (p1hit & hittimer < 5) player1.scale = linear_tween((float)hittimer / 5f, 1, 1.5f);
+            else if (p1hit) player1.scale = linear_tween((float)(hittimer - 5) / 5f, 1.5f, 1);
+
+            //start of round, scale ball
+            if (roundtimer < 25) ball.scale = linear_tween((float)roundtimer / 25f, 10f, .15f);
+            else if (roundtimer < 50) ball.scale = linear_tween((float)(roundtimer - 25) / 25f, .15f, 4f);
+            else if (roundtimer < 75) ball.scale = linear_tween((float)(roundtimer - 50) / 25f, 4f, 1f);
+            else pauseOn = false;
+
+            //When a person scores, make animiation
+            if (!ball.isVisible && justscoredtimer < 10) {
+                if (p1JustScored) {
+                    hud.scale1 = linear_tween((float)justscoredtimer / 10, 1, 1.5f);
+                    hud.textColor1 = Color.Green;
+                }
+            }
+            if (!ball.isVisible && justscoredtimer < 20) {
+                if (p1JustScored) {
+                    hud.scale1 = linear_tween((float)(justscoredtimer-10) / 10, 1.5f, 1f);
+                    hud.textColor1 = Color.White;
+                }
+            }
         }
 
         //function that checks if ball hits score line
@@ -139,17 +167,25 @@ namespace WongPong {
             if (ball.position.X < 5) {
                 ball.Kill();
                 hud.p2score++;
+                p2JustScored = true;
+                justscoredtimer = 0;
             }
 
             //if ball passes player 2's goal
             if (ball.position.X > Defualt.Default._W - ball.texture.Width - 5) {
                 ball.Kill();
                 hud.p1score++;
+                p1JustScored = true;
+                justscoredtimer = 0;
             }
 
             //if ball has been destroyed (no particles)
-            if (ball.particles.Count() == 0) {
+            if (ball.particles.Count() == 0 && !pauseOn) {
                 ball.Reset();
+                if (p2JustScored) { ball.position = new Vector2(Defualt.Default._W * .9f, Defualt.Default._H / 2); p2JustScored = false; ball.velocity.X *= -1; } 
+                else if (p1JustScored) { ball.position = new Vector2(Defualt.Default._W * .1f, Defualt.Default._H / 2); p1JustScored = false;  }
+                roundtimer = 0;
+                pauseOn = true;
             }
 
         }

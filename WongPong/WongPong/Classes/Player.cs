@@ -38,6 +38,7 @@ namespace WongPong {
             scale = 1.0f;
             kinect = new Kinect();  //Make kinect object
             origin = new Vector2(0,0);
+            
 
         }
 
@@ -49,6 +50,7 @@ namespace WongPong {
             if (type == 1) position = new Vector2(15, Defualt.Default._H / 2 - texture.Height / 2);
             else if (type == 2) position = new Vector2(Defualt.Default._W - texture.Width - 15, Defualt.Default._H / 2 - texture.Height / 2);
             boundingBox = new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height);
+            origin.X = (texture.Width / 2); origin.Y = (texture.Height / 2);
 
             //initialize kinect stuff if needed
             if (Defualt.Default.UsingKinect) {
@@ -61,10 +63,7 @@ namespace WongPong {
         public void Update(GameTime gametime) {
 
             //update boundingBox & other thigns
-            origin.X = (texture.Width / 2); origin.Y = (texture.Height / 2);
             boundingBox.X = (int)position.X; boundingBox.Y = (int)position.Y;
-            
-
             bool moveUp = false;
             bool moveDown = false;
             velocity = 0;
