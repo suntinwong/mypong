@@ -30,7 +30,7 @@ namespace WongPong {
             //Set important attributes
             maxParticleLife = 20;
             position = new Vector2(Defualt.Default._W / 10, Defualt.Default._H / 2);
-            velocity = new Vector2(5, 0);
+            velocity = new Vector2(3.5f, 0);
             maxVelocity = new Vector2(12, 12);
             
             //set other stuff
@@ -80,7 +80,7 @@ namespace WongPong {
 
             //Check wall coliisions and act accordingly
             if (position.X > Defualt.Default._W - texture.Width || position.X < 0) { velocity.X *= -1; }
-            if (position.Y > Defualt.Default._H - texture.Height || position.Y < 0) { velocity.Y *= -1; }
+            if (position.Y > Defualt.Default._H - texture.Height || position.Y < 0) { velocity.Y *= -1; PaddleHit(); }
 
             //set limits on the velocity
             if (velocity.X > maxVelocity.X) velocity.X = maxVelocity.X;
@@ -158,7 +158,7 @@ namespace WongPong {
             particles.Clear();
             isVisible = true;
             position = new Vector2(Defualt.Default._W / 10, Defualt.Default._H / 2);
-            velocity = new Vector2(5, 0);
+            velocity = new Vector2(3.5f, 0);
         }
     }
 

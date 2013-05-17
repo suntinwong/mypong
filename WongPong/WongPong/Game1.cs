@@ -115,18 +115,18 @@ namespace WongPong {
             if (ball.boundingBox.Intersects(player1.boundingBox)) {
                 ball.velocity.X  = rand.Next(4,8); ball.velocity.X += player1.velocity/3;
                 if (ball.velocity.Y > 0) ball.velocity.Y -= 2;
+                if (ball.velocity.Y < .25) ball.velocity.Y = rand.Next(-25, 25) / 10f;
                 ball.velocity.Y += player1.velocity/3;
-                p1hit = true; ballhit = true; hittimer = 0;
-                ball.PaddleHit(); 
+                p1hit = true; ballhit = true; hittimer = 0; ball.PaddleHit(); 
             }
 
             //ball collides with player #2
             else if (ball.boundingBox.Intersects(player2.boundingBox)) {
                 ball.velocity.X = rand.Next(-8, -4); ball.velocity.X -= player2.velocity / 3;
-                if (ball.velocity.Y > 0) ball.velocity.Y -= 2;
+                if (ball.velocity.Y > 0) ball.velocity.Y /= 3;
+                if (ball.velocity.Y < .25) ball.velocity.Y = rand.Next(-15, 15) / 10f;
                 ball.velocity.Y += player2.velocity / 3;
-                p2hit = true; ballhit = true; hittimer = 0;
-                ball.PaddleHit();
+                p2hit = true; ballhit = true; hittimer = 0;  ball.PaddleHit();
             }
 
             //ball doesnt collide with player
@@ -137,11 +137,13 @@ namespace WongPong {
         //function that does all additional animation
         private void do_animations(GameTime gameTime) {
 
-            //Paddle scaling when hit
+            //Paddle & ball scaling when hit
             if (p2hit & hittimer < 5) player2.scale = linear_tween((float)hittimer / 5f, 1, 1.5f);
             else if (p2hit) player2.scale = linear_tween((float)(hittimer-5)/5f, 1.5f, 1);
             if (p1hit & hittimer < 5) player1.scale = linear_tween((float)hittimer / 5f, 1, 1.5f);
             else if (p1hit) player1.scale = linear_tween((float)(hittimer - 5) / 5f, 1.5f, 1);
+            if ((p2hit || p1hit) && hittimer < 5) ball.scale = linear_tween((float)hittimer / 5f, 1, 1.3f);
+            else if ((p2hit || p1hit)) ball.scale = linear_tween((float)(hittimer -5) / 5f, 1.3f, 1f);
 
             //start of round, scale ball
             if (roundtimer < 25) ball.scale = linear_tween((float)roundtimer / 25f, 10f, .15f);

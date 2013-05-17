@@ -38,8 +38,6 @@ namespace WongPong {
             scale = 1.0f;
             kinect = new Kinect();  //Make kinect object
             origin = new Vector2(0,0);
-            
-
         }
 
         //Load Content Method
