@@ -19,6 +19,7 @@ namespace WongPong {
         Player player1 = new Player(1); //make player1
         Player player2 = new Player(2); //make player2
         Ball ball = new Ball();         //make the ball
+        HUD hud = new HUD();            //make the Huds up display
 
         //other axullairy stuff
         bool p1hit = false;
@@ -48,7 +49,7 @@ namespace WongPong {
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            hud.LoadContent(Content,GraphicsDevice);
             player1.LoadContent(Content);    //load player 1
             player2.LoadContent(Content);   //load player 2
             ball.LoadContent(Content);      //load the ball
@@ -65,6 +66,7 @@ namespace WongPong {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed) this.Exit();
             player1.Update(gameTime);    //update the player 1
             player2.Update(gameTime);    //update player 2
+            hud.Update(gameTime);        //update the hud
             ball.Update(gameTime,Content,pauseOn);       //update the ball
             manage_collisions();         //do collision logic
             Score_Check();              //check & update scores
@@ -78,7 +80,7 @@ namespace WongPong {
 
             //do all drawings here
             spriteBatch.Begin();
-
+            hud.Draw();                     //draw the hud
             player1.Draw(spriteBatch,p1hit); //draw the players
             player2.Draw(spriteBatch,p2hit); //draw the players
             ball.Draw(spriteBatch,ballhit); //draw the ball
@@ -136,13 +138,13 @@ namespace WongPong {
             //if ball passes player 1's goal
             if (ball.position.X < 5) {
                 ball.Kill();
-                player2.score++;
+                hud.p2score++;
             }
 
             //if ball passes player 2's goal
             if (ball.position.X > Defualt.Default._W - ball.texture.Width - 5) {
                 ball.Kill();
-                player1.score++;
+                hud.p1score++;
             }
 
             //if ball has been destroyed (no particles)

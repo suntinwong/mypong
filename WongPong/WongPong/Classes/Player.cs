@@ -19,7 +19,6 @@ namespace WongPong {
         public Rectangle boundingBox; //bounding box used for collision
         public int moveSpeed;        //Player's move max speed
         public int velocity;        //player's current velocity
-        public int score;            //player's score
         private int type;            //player's type # (player 1 or player 2?)
         public float rotationAngle;          //object's rotation
         public float scale;             //object's scale
@@ -35,7 +34,6 @@ namespace WongPong {
             //other attributes
             velocity = 0;
             type = newtype;
-            score = 0;
             rotationAngle = 0;
             scale = 1.0f;
             kinect = new Kinect();  //Make kinect object

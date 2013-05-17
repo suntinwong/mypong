@@ -109,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Ball.cs" />
+    <Compile Include="Classes\Hud.cs" />
     <Compile Include="Classes\Particle.cs" />
     <Compile Include="Classes\Player.cs" />
     <Compile Include="Kinect.cs" />
