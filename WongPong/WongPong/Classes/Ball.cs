@@ -17,6 +17,7 @@ namespace WongPong {
         public Vector2 velocity; //velocity of ball (x/y movement)
         public int directionRight; //if ball is suppose to move right
         public bool isVisible;    //if the ball is visible and to be rendered
+        private float rotationAngle; // rotation of the ball
         private Vector2 maxVelocity; //max velocity of the ball (x/y movement)
         public int maxParticleLife; //life of each generated particles
         public float scale;         //object's scale
@@ -36,6 +37,7 @@ namespace WongPong {
             isVisible = true;
             particles = new List<Particle>();
             scale = 1.0f;
+            rotationAngle = 0f;
             
         }
 
@@ -70,7 +72,7 @@ namespace WongPong {
                 (int)position.X + texture.Width / 2 + rand.Next(-4, 4),
                 (int)position.Y + texture.Width / 2 + rand.Next(-4, 4),
                 new Vector2(rand.Next(-1, 1), rand.Next(-1, 1)),
-                Color.Yellow));
+                Color.Yellow ));
 
             //Move the ball && update bounding box, degrade X velocity
             position.X += velocity.X; position.Y += velocity.Y;
@@ -86,20 +88,24 @@ namespace WongPong {
             if (velocity.Y > maxVelocity.Y) velocity.Y = maxVelocity.Y;
             else if (velocity.Y < -1 * maxVelocity.Y) velocity.Y = -1 * maxVelocity.Y;
 
+            //rotate particle
+            float elapsed = (float)gametime.ElapsedGameTime.TotalSeconds;
+            rotationAngle += elapsed ;
+            float circle = MathHelper.Pi * 2;
+            rotationAngle = rotationAngle % circle;
+
         }
 
         //draw method
         public void Draw(SpriteBatch spritebatch,bool hit) {
 
             //draw the ball & particles
-            Color c = Color.Yellow;
+            Color c = Color.Gold;
             if (hit) c = Color.White;
-            if(isVisible) spritebatch.Draw(texture, position+origin, null, c,0f,origin, scale, SpriteEffects.None, 0f);
-
+            if(isVisible) spritebatch.Draw(texture, position+origin, null, c,rotationAngle,origin, scale, SpriteEffects.None, 0f);
             for (int i = 0; i < particles.Count(); i++) {
-                if (!hit) particles[i].color = Color.Yellow;
-                else particles[i].color = Color.White;
-                particles[i].Draw(spritebatch);
+                if (!hit) particles[i].Draw(spritebatch, Color.Black);
+                else particles[i].Draw(spritebatch, Color.White,true);
             }
             
         }
@@ -114,7 +120,7 @@ namespace WongPong {
 
             //make directional small explision
             Random rand = new Random();
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 6; i++) {
                 Particle p = new Particle(particleTexture,
                     (int)position.X, (int)position.Y,
                     new Vector2(rand.Next(xMin,xMax) / 10f, rand.Next(-5, 5) / 10f),

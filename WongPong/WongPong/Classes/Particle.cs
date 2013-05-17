@@ -52,9 +52,11 @@ namespace WongPong {
         }
 
         //Draw method
-        public void Draw(SpriteBatch spritebatch) {
-            spritebatch.Draw(texture, position, null, color, rotationAngle, origin, 1.0f, SpriteEffects.None, 0f);
-
+        public void Draw(SpriteBatch spritebatch, Color c, bool usecolor = false) {
+            if(!usecolor)
+                spritebatch.Draw(texture, position, null, color, rotationAngle, origin, 1.0f, SpriteEffects.None, 0f);
+            else
+                spritebatch.Draw(texture, position, null, c, rotationAngle, origin, 1.0f, SpriteEffects.None, 0f);
         }
 
     }

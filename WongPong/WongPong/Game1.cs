@@ -117,16 +117,20 @@ namespace WongPong {
                 if (ball.velocity.Y > 0) ball.velocity.Y -= 2;
                 ball.velocity.Y += player1.velocity/3;
                 p1hit = true; ballhit = true; hittimer = 0;
-                ball.PaddleHit();
+                ball.PaddleHit(); 
             }
 
             //ball collides with player #2
-            if (ball.boundingBox.Intersects(player2.boundingBox)) {
-                ball.velocity.X = rand.Next(-8,-4); ball.velocity.X -= player2.velocity / 3;
-                if (ball.velocity.Y > 0) ball.velocity.Y-= 2;
-                ball.velocity.Y += player2.velocity/3;
-                p2hit = true; ballhit = true;  hittimer = 0;
+            else if (ball.boundingBox.Intersects(player2.boundingBox)) {
+                ball.velocity.X = rand.Next(-8, -4); ball.velocity.X -= player2.velocity / 3;
+                if (ball.velocity.Y > 0) ball.velocity.Y -= 2;
+                ball.velocity.Y += player2.velocity / 3;
+                p2hit = true; ballhit = true; hittimer = 0;
                 ball.PaddleHit();
+            }
+
+            //ball doesnt collide with player
+            else {
             }
         }
 
@@ -144,20 +148,17 @@ namespace WongPong {
             else if (roundtimer < 50) ball.scale = linear_tween((float)(roundtimer - 25) / 25f, .15f, 4f);
             else if (roundtimer < 75) ball.scale = linear_tween((float)(roundtimer - 50) / 25f, 4f, 1f);
             else pauseOn = false;
-
+            
             //When a person scores, make animiation
-            if (!ball.isVisible && justscoredtimer < 10) {
-                if (p1JustScored) {
-                    hud.scale1 = linear_tween((float)justscoredtimer / 10, 1, 1.5f);
-                    hud.textColor1 = Color.Green;
-                }
+            if (!ball.isVisible && justscoredtimer < 1) {
+                if (p1JustScored) { hud.scale1 = 2.5f; hud.textColor1 = Color.Green; }
+                else if (p2JustScored) {hud.scale2 = 2.5f; hud.textColor2 = Color.LawnGreen; }
             }
-            if (!ball.isVisible && justscoredtimer < 20) {
-                if (p1JustScored) {
-                    hud.scale1 = linear_tween((float)(justscoredtimer-10) / 10, 1.5f, 1f);
-                    hud.textColor1 = Color.White;
-                }
+            else if (!ball.isVisible && justscoredtimer < 20) {
+                if (p1JustScored) hud.scale1 = linear_tween((float)(justscoredtimer) / 20f, 3.5f, 1f);
+                else if (p2JustScored) hud.scale2 = linear_tween((float)(justscoredtimer) / 20f, 3.5f, 1f);
             }
+            else if (!ball.isVisible) { hud.textColor1 = Color.White; hud.textColor2 = Color.White; }
         }
 
         //function that checks if ball hits score line
@@ -185,6 +186,7 @@ namespace WongPong {
                 if (p2JustScored) { ball.position = new Vector2(Defualt.Default._W * .9f, Defualt.Default._H / 2); p2JustScored = false; ball.velocity.X *= -1; } 
                 else if (p1JustScored) { ball.position = new Vector2(Defualt.Default._W * .1f, Defualt.Default._H / 2); p1JustScored = false;  }
                 roundtimer = 0;
+                hud.textColor1 = Color.White;
                 pauseOn = true;
             }
 
