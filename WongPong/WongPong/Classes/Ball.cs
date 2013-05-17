@@ -11,6 +11,7 @@ namespace WongPong {
     public class Ball {
 
         public Texture2D texture; //ball's texture
+        private Texture2D particleTexture; //particles' texture
         public Vector2 position; //position of ball in the game world
         public Rectangle boundingBox; //bounding box used for collision
         public Vector2 velocity; //velocity of ball (x/y movement)
@@ -18,8 +19,7 @@ namespace WongPong {
         public bool isVisible;    //if the ball is visible and to be rendered
         private Vector2 maxVelocity; //max velocity of the ball (x/y movement)
         public int maxParticleLife; //life of each generated particles
-        private float degradeValue;
-        private List<Particle> particles;
+        public List<Particle> particles;
 
         //Constructor
         public Ball() {
@@ -28,13 +28,11 @@ namespace WongPong {
             //Set important attributes
             maxParticleLife = 20;
             position = new Vector2(Defualt.Default._W / 5, Defualt.Default._H / 2);
-            velocity = new Vector2(2, rand.Next(2, 4));
+            velocity = new Vector2(5, 0);
             maxVelocity = new Vector2(12, 12);
-            degradeValue = 0;
-
+            
             //set other stuff
             isVisible = true;
-            directionRight = 1;
             particles = new List<Particle>();
             
         }
@@ -43,30 +41,37 @@ namespace WongPong {
         public void LoadContent(ContentManager content){
 
             //set the texture & bounding box
-            texture = content.Load<Texture2D>("Artwork/ball"); 
+            texture = content.Load<Texture2D>("Artwork/ball");
+            particleTexture = content.Load<Texture2D>("Artwork/ball_particle");
             boundingBox = new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height); 
         }
 
         //update method
         public void Update(GameTime gametime,ContentManager Content, bool pause) {
 
+            //Get out if game is paused
             if (pause) return;
 
-
-            //make a particle trail and update curent particles
-            Random rand = new Random();
-            particles.Add(new Particle(Content, (int)position.X + texture.Width/2 + rand.Next(-8,8), (int)position.Y+texture.Width/2 + rand.Next(-8,8)));
-            particles.Add(new Particle(Content, (int)position.X + texture.Width / 2 + rand.Next(-8, 8), (int)position.Y + texture.Width / 2 + rand.Next(-8, 8)));
+            //Update curent particles
             for (int i = 0; i < particles.Count(); i++) {
                 particles[i].Update(gametime);
                 if (particles[i].life > maxParticleLife) particles.RemoveAt(i);
             }
 
+            //Dont update if not visible
+            if (!isVisible) return;
+
+            //Make particle trail
+            Random rand = new Random();
+            particles.Add(new Particle(particleTexture,
+                (int)position.X + texture.Width / 2 + rand.Next(-4, 4),
+                (int)position.Y + texture.Width / 2 + rand.Next(-4, 4),
+                new Vector2(rand.Next(-1, 1), rand.Next(-1, 1)),
+                Color.Yellow));
+
             //Move the ball && update bounding box, degrade X velocity
             position.X += velocity.X; position.Y += velocity.Y;
             boundingBox.X = (int)position.X; boundingBox.Y = (int)position.Y;
-            if (directionRight == 1) velocity.X -= degradeValue;
-            else velocity.X += degradeValue;
 
             //Check wall coliisions and act accordingly
             if (position.X > Defualt.Default._W - texture.Width || position.X < 0) { velocity.X *= -1; }
@@ -84,12 +89,44 @@ namespace WongPong {
         public void Draw(SpriteBatch spritebatch) {
 
             //draw the ball
-            if(isVisible) spritebatch.Draw(texture, position, Color.White);
+            if(isVisible) spritebatch.Draw(texture, position, Color.Yellow);
 
             //draw all particles
             for (int i = 0; i < particles.Count(); i++) particles[i].Draw(spritebatch);
         }
+
+        //destroy the ball at current location, make particle effect
+        public void Kill() {
+            
+            //Make explision
+            Random rand = new Random();
+            for (int i = 0; i < 50; i++) {
+                Particle p = new Particle(particleTexture,
+                    (int)position.X,(int)position.Y,
+                    new Vector2(rand.Next(-1000,1000)/100f,rand.Next(-1000,1000)/100f),
+                    Color.Orange);
+                p.life = - 200;
+                particles.Add(p);
+            }
+
+            //set attributes
+            isVisible = false;
+            velocity = new Vector2(0, 0);
+            position = new Vector2(Defualt.Default._W / 2, Defualt.Default._H / 2);
+            boundingBox.X = (int)position.X; boundingBox.Y = (int)position.Y;
+
+        }
+
+        //reset the ball
+        public void Reset() {
+            particles.Clear();
+            isVisible = true;
+            position = new Vector2(Defualt.Default._W / 5, Defualt.Default._H / 2);
+            velocity = new Vector2(5, 0);
+        }
     }
+
+  
 
     
 }

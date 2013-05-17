@@ -27,7 +27,7 @@ namespace WongPong {
         public Player(int newtype = 1) {
 
             //set important attributes
-            moveSpeed = 10;
+            moveSpeed = 12;
             
             //other attributes
             velocity = 0;
@@ -85,12 +85,11 @@ namespace WongPong {
             if (moveDown) {position.Y += moveSpeed; velocity = moveSpeed;}
             if (position.Y <= 0) position.Y = 0;
             if (position.Y >= Defualt.Default._H - texture.Height) position.Y = Defualt.Default._H - texture.Height;
-            
         }
 
         //draw method
         public void Draw(SpriteBatch spritebatch,bool hit = false) {
-            if (!hit) spritebatch.Draw(texture, position, Color.White);
+            if (!hit) spritebatch.Draw(texture, position, Color.Crimson);
             else spritebatch.Draw(texture, position, Color.Gold);
         }
     }

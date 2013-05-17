@@ -66,12 +66,13 @@ namespace WongPong {
             player2.Update(gameTime);    //update player 2
             ball.Update(gameTime,Content,pauseOn);       //update the ball
             manage_collisions();         //do collision logic
+            Score_Check();              //check & update scores
             base.Update(gameTime);      //update the gametime
         }
 
         //Draw Method
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.White);
+            GraphicsDevice.Clear(Color.Black);
 
             //do all drawings here
             spriteBatch.Begin();
@@ -93,25 +94,47 @@ namespace WongPong {
         private void manage_collisions() {
 
             hittimer++;
-
+            Random rand = new Random();
             if (p1hit && hittimer > 10) p1hit = false;
             if (p2hit && hittimer > 10) p2hit = false;
             
             //ball collides with player #1
             if (ball.boundingBox.Intersects(player1.boundingBox)) {
-                ball.velocity.X *= -1; ball.velocity.X += .5f;
-                ball.velocity.Y *= 1;
-                ball.directionRight = -1;
+                ball.velocity.X  = rand.Next(4,8); ball.velocity.X += player1.velocity/3;
+                if (ball.velocity.Y > 0) ball.velocity.Y -= 2;
+                ball.velocity.Y += player1.velocity/3; 
                 p1hit = true; hittimer = 0;
             }
 
             //ball collides with player #2
             if (ball.boundingBox.Intersects(player2.boundingBox)) {
-                ball.velocity.X *= -1; ball.velocity.X -= .5f;
-                ball.velocity.Y *= 1;
-                ball.directionRight = 1;
+                ball.velocity.X = rand.Next(-8,-4); ball.velocity.X -= player2.velocity / 3;
+                if (ball.velocity.Y > 0) ball.velocity.Y-= 2;
+                ball.velocity.Y += player2.velocity/3;
                 p2hit = true; hittimer = 0;
             }
+        }
+
+        //function that checks if ball hits score line
+        private void Score_Check() {
+
+            //if ball passes player 1's goal
+            if (ball.position.X < 5) {
+                ball.Kill();
+                player2.score++;
+            }
+
+            //if ball passes player 2's goal
+            if (ball.position.X > Defualt.Default._W - ball.texture.Width - 5) {
+                ball.Kill();
+                player1.score++;
+            }
+
+            //if ball has been destroyed (no particles)
+            if (ball.particles.Count() == 0) {
+                ball.Reset();
+            }
+
         }
 
 

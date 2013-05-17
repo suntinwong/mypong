@@ -15,11 +15,14 @@ namespace WongPong {
         public Vector2 velocity;      //Particle's velocity
         public int life;              //Particle's life
         public float rotationAngle;          //particle's rotation
+        public Color color; //particle's defualt color
 
         //particle constructor
-        public Particle(ContentManager Content, int x, int y) {
+        public Particle(Texture2D newTexture, int x, int y, Vector2 newVelocity,Color newColor) {
             position = new Vector2(x, y);
-            texture = Content.Load<Texture2D>("Artwork/ball_particle");
+            velocity = newVelocity;
+            texture = newTexture;
+            color = newColor;
 
             //set origin (center)
             origin.X = texture.Width / 2;
@@ -29,6 +32,8 @@ namespace WongPong {
             Random rand = new Random();
             rotationAngle = rand.Next(0, 360);
             life = 0;
+
+            
         }
 
         //Update method
@@ -48,7 +53,7 @@ namespace WongPong {
 
         //Draw method
         public void Draw(SpriteBatch spritebatch) {
-            spritebatch.Draw(texture, position, null, Color.Blue, rotationAngle, origin, 1.0f, SpriteEffects.None, 0f);
+            spritebatch.Draw(texture, position, null, color, rotationAngle, origin, 1.0f, SpriteEffects.None, 0f);
 
         }
 
