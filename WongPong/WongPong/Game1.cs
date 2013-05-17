@@ -99,7 +99,7 @@ namespace WongPong {
             
             //ball collides with player #1
             if (ball.boundingBox.Intersects(player1.boundingBox)) {
-                ball.velocity.X *= -1; ball.velocity.X += 20;
+                ball.velocity.X *= -1; ball.velocity.X += .5f;
                 ball.velocity.Y *= 1;
                 ball.directionRight = -1;
                 p1hit = true; hittimer = 0;
@@ -107,7 +107,7 @@ namespace WongPong {
 
             //ball collides with player #2
             if (ball.boundingBox.Intersects(player2.boundingBox)) {
-                ball.velocity.X *= -1; ball.velocity.X -= 20;
+                ball.velocity.X *= -1; ball.velocity.X -= .5f;
                 ball.velocity.Y *= 1;
                 ball.directionRight = 1;
                 p2hit = true; hittimer = 0;

@@ -7,28 +7,49 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace WongPong.Classes {
+namespace WongPong {
     public class Particle {
 
         public Texture2D texture;     //Particle's texture
-        public Vector2 position;      //position of Player in the game world
+        public Vector2 position,origin;      //position of Player in the game world
         public Vector2 velocity;      //Particle's velocity
+        public int life;              //Particle's life
+        public float rotationAngle;          //particle's rotation
 
         //particle constructor
-        Particle(ContentManager Content, int x, int y) {
+        public Particle(ContentManager Content, int x, int y) {
             position = new Vector2(x, y);
             texture = Content.Load<Texture2D>("Artwork/ball_particle");
+
+            //set origin (center)
+            origin.X = texture.Width / 2;
+            origin.Y = texture.Height / 2;
+
+            //set rotation angle
+            Random rand = new Random();
+            rotationAngle = rand.Next(0, 360);
+            life = 0;
         }
 
         //Update method
-        void Update() {
+        public void Update(GameTime gametime) {
+            
+            //Update position
             position.X += velocity.X;
             position.Y += velocity.Y;
+
+            //rotate particle
+            float elapsed = (float)gametime.ElapsedGameTime.TotalSeconds;
+            rotationAngle += elapsed;
+            float circle = MathHelper.Pi * 2;
+            rotationAngle = rotationAngle % circle;
+            life++;
         }
 
         //Draw method
-        void Draw(SpriteBatch spritebatch) {
-            spritebatch.Draw(texture, position, Color.Blue);
+        public void Draw(SpriteBatch spritebatch) {
+            spritebatch.Draw(texture, position, null, Color.Blue, rotationAngle, origin, 1.0f, SpriteEffects.None, 0f);
+
         }
 
     }
