@@ -71,7 +71,7 @@ namespace WongPong {
             particles.Add(new Particle(particleTexture,
                 (int)position.X + texture.Width / 2 + rand.Next(-4, 4),
                 (int)position.Y + texture.Width / 2 + rand.Next(-4, 4),
-                new Vector2(rand.Next(-1, 1), rand.Next(-1, 1)),
+                new Vector2(rand.Next(-150,150)/100f, rand.Next(-150, 150)/100f),
                 Color.Yellow ));
 
             //Move the ball && update bounding box, degrade X velocity

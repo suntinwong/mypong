@@ -29,6 +29,7 @@ namespace WongPong {
         bool p2JustScored = false;
         bool p1JustScored = false;
         List<Rectangle> hud_recs = new List<Rectangle>();
+        Vector2 hud_text1pos, hud_text2pos;
 
         //timers
         int hittimer = 0;
@@ -65,6 +66,8 @@ namespace WongPong {
 
             for (int i = 0; i < hud.middle_line.Count(); i++)
                 hud_recs.Add(hud.middle_line[i]);
+            hud_text1pos = hud.position1;
+            hud_text2pos = hud.position2;
 
         }
 
@@ -124,7 +127,7 @@ namespace WongPong {
                 ball.velocity.X  = rand.Next(6,12); ball.velocity.X += player1.velocity/3;
                 if (ball.velocity.Y > 0) ball.velocity.Y -= 2;
                 if (ball.velocity.Y < .25) ball.velocity.Y = rand.Next(-25, 25) / 10f;
-                ball.velocity.Y += player1.velocity/3;
+                ball.velocity.Y += player1.velocity / 3; ball.velocity.X += player1.velocity / 4;
                 p1hit = true; ballhit = true; hittimer = 0; ball.PaddleHit(player1.color); 
             }
 
@@ -133,7 +136,7 @@ namespace WongPong {
                 ball.velocity.X = rand.Next(-12, -6); ball.velocity.X -= player2.velocity / 3;
                 if (ball.velocity.Y > 0) ball.velocity.Y /= 3;
                 if (ball.velocity.Y < .25) ball.velocity.Y = rand.Next(-15, 15) / 10f;
-                ball.velocity.Y += player2.velocity / 3;
+                ball.velocity.Y += player2.velocity / 3; ball.velocity.X -= player2.velocity / 4;
                 p2hit = true; ballhit = true; hittimer = 0;  ball.PaddleHit(player2.color);
             }
 
@@ -165,6 +168,10 @@ namespace WongPong {
                         hud.middle_line[i].Width,hud.middle_line[i].Height));
                 }
                 hud.middle_line = r;
+                hud.position1.X = (int)linear_tween((float)wallhittimer / 5f, hud_text1pos.X, hud_text1pos.X + 10);
+                hud.position1.Y = (int)linear_tween((float)wallhittimer / 5f, hud_text1pos.Y, hud_text1pos.Y + 10);
+                hud.position2.X = (int)linear_tween((float)wallhittimer / 5f, hud_text2pos.X, hud_text2pos.X + 10);
+                hud.position2.Y = (int)linear_tween((float)wallhittimer / 5f, hud_text2pos.Y, hud_text2pos.Y + 10);
             }
             else if (wallhit && wallhittimer < 10) {
                 List<Rectangle> r = new List<Rectangle>();
@@ -175,6 +182,10 @@ namespace WongPong {
                         hud.middle_line[i].Width,hud.middle_line[i].Height));
                 }
                 hud.middle_line = r;
+                hud.position1.X = (int)linear_tween((float)(wallhittimer-5) / 5f, hud_text1pos.X+10, hud_text1pos.X-10);
+                hud.position1.Y = (int)linear_tween((float)(wallhittimer-5) / 5f, hud_text1pos.Y+10, hud_text1pos.Y-10);
+                hud.position2.X = (int)linear_tween((float)(wallhittimer-5) / 5f, hud_text2pos.X+10, hud_text2pos.X-10);
+                hud.position2.Y = (int)linear_tween((float)(wallhittimer-5) / 5f, hud_text2pos.Y+10, hud_text2pos.Y-10);
             } 
             else if (wallhit && wallhittimer < 15) {
                 List<Rectangle> r = new List<Rectangle>();
@@ -185,6 +196,10 @@ namespace WongPong {
                         hud.middle_line[i].Width, hud.middle_line[i].Height));
                 }
                 hud.middle_line = r;
+                hud.position1.X = (int)linear_tween((float)(wallhittimer - 10) / 5f, hud_text1pos.X - 10, hud_text1pos.X);
+                hud.position1.Y = (int)linear_tween((float)(wallhittimer - 10) / 5f, hud_text1pos.Y - 10, hud_text1pos.Y);
+                hud.position2.X = (int)linear_tween((float)(wallhittimer - 10) / 5f, hud_text2pos.X - 10, hud_text2pos.X);
+                hud.position2.Y = (int)linear_tween((float)(wallhittimer - 10) / 5f, hud_text2pos.Y - 10, hud_text2pos.Y);
             } 
            
 
@@ -237,8 +252,8 @@ namespace WongPong {
             //if ball has been destroyed (no particles)
             if (ball.particles.Count() == 0 && !pauseOn) {
                 ball.Reset();
-                if (p2JustScored) { ball.position = new Vector2(Defualt.Default._W * .9f, Defualt.Default._H / 2); p2JustScored = false; ball.velocity.X *= -1; } 
-                else if (p1JustScored) { ball.position = new Vector2(Defualt.Default._W * .1f, Defualt.Default._H / 2); p1JustScored = false;  }
+                if (p2JustScored) { ball.position = new Vector2(Defualt.Default._W * .9f, player2.position.Y + player2.texture.Height/2); p2JustScored = false; ball.velocity.X *= -1; } 
+                else if (p1JustScored) { ball.position = new Vector2(Defualt.Default._W * .1f, player1.position.Y + player1.texture.Height/2); p1JustScored = false;  }
                 roundtimer = 0;
                 hud.textColor1 = Color.White;
                 pauseOn = true;
