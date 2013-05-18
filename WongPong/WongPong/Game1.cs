@@ -16,20 +16,23 @@ namespace WongPong {
         SpriteBatch spriteBatch;
 
         //Objects
-        Player player1 = new Player(1); //make player1
-        Player player2 = new Player(2); //make player2
+        Player player1 = new Player(Color.Red,1); //make player1
+        Player player2 = new Player(Color.Blue,2); //make player2
         Ball ball = new Ball();         //make the ball
         HUD hud = new HUD();            //make the Huds up display
 
         //other axullairy stuff
+        bool wallhit = false;
         bool p1hit = false;
         bool p2hit = false;
         bool ballhit = false;
         bool p2JustScored = false;
         bool p1JustScored = false;
+        List<Rectangle> hud_recs = new List<Rectangle>();
 
         //timers
         int hittimer = 0;
+        int wallhittimer = 0;
         int roundtimer = 0;
         int justscoredtimer = 0;
         bool pauseOn = true;
@@ -59,6 +62,10 @@ namespace WongPong {
             player1.LoadContent(Content);    //load player 1
             player2.LoadContent(Content);   //load player 2
             ball.LoadContent(Content);      //load the ball
+
+            for (int i = 0; i < hud.middle_line.Count(); i++)
+                hud_recs.Add(hud.middle_line[i]);
+
         }
 
         //Unload Content Method
@@ -78,7 +85,7 @@ namespace WongPong {
             hud.Update(gameTime);        //update the hud
             do_animations(gameTime);    //do all game animations
 
-            hittimer++; roundtimer++; justscoredtimer++;
+            hittimer++; roundtimer++; justscoredtimer++; wallhittimer++; 
             base.Update(gameTime);      //update the gametime
         }
 
@@ -110,23 +117,34 @@ namespace WongPong {
             if (p1hit && hittimer > 10) p1hit = false;
             if (p2hit && hittimer > 10) p2hit = false;
             if (ballhit && hittimer > 10) ballhit = false;
+            if (wallhit && wallhittimer > 15) wallhit = false;
             
             //ball collides with player #1
             if (ball.boundingBox.Intersects(player1.boundingBox)) {
-                ball.velocity.X  = rand.Next(4,8); ball.velocity.X += player1.velocity/3;
+                ball.velocity.X  = rand.Next(6,12); ball.velocity.X += player1.velocity/3;
                 if (ball.velocity.Y > 0) ball.velocity.Y -= 2;
                 if (ball.velocity.Y < .25) ball.velocity.Y = rand.Next(-25, 25) / 10f;
                 ball.velocity.Y += player1.velocity/3;
-                p1hit = true; ballhit = true; hittimer = 0; ball.PaddleHit(); 
+                p1hit = true; ballhit = true; hittimer = 0; ball.PaddleHit(player1.color); 
             }
 
             //ball collides with player #2
             else if (ball.boundingBox.Intersects(player2.boundingBox)) {
-                ball.velocity.X = rand.Next(-8, -4); ball.velocity.X -= player2.velocity / 3;
+                ball.velocity.X = rand.Next(-12, -6); ball.velocity.X -= player2.velocity / 3;
                 if (ball.velocity.Y > 0) ball.velocity.Y /= 3;
                 if (ball.velocity.Y < .25) ball.velocity.Y = rand.Next(-15, 15) / 10f;
                 ball.velocity.Y += player2.velocity / 3;
-                p2hit = true; ballhit = true; hittimer = 0;  ball.PaddleHit();
+                p2hit = true; ballhit = true; hittimer = 0;  ball.PaddleHit(player2.color);
+            }
+
+            //ball colides with wall coliisions and act accordingly
+            else if (ball.position.X > Defualt.Default._W - ball.texture.Width || ball.position.X < 0) 
+                { ball.velocity.X *= -1; }
+            else if (ball.position.Y > Defualt.Default._H - ball.texture.Height || ball.position.Y < 0) { 
+                ball.velocity.Y *= -1; 
+                ball.PaddleHit(Color.White);
+                wallhit = true;
+                wallhittimer = 0;
             }
 
             //ball doesnt collide with player
@@ -136,6 +154,39 @@ namespace WongPong {
 
         //function that does all additional animation
         private void do_animations(GameTime gameTime) {
+           
+            //screen hud shake when something
+            if (wallhit && wallhittimer < 5) { 
+                List<Rectangle> r = new List<Rectangle>();
+                for (int i = 0; i < hud.middle_line.Count(); i++) {
+                    r.Add(new Rectangle(
+                        (int)linear_tween((float)wallhittimer / 5f, hud_recs[i].X, hud_recs[i].X + 10),
+                        (int)linear_tween((float)wallhittimer / 5f, hud_recs[i].Y, hud_recs[i].Y +10),
+                        hud.middle_line[i].Width,hud.middle_line[i].Height));
+                }
+                hud.middle_line = r;
+            }
+            else if (wallhit && wallhittimer < 10) {
+                List<Rectangle> r = new List<Rectangle>();
+                for (int i = 0; i < hud.middle_line.Count(); i++) {
+                    r.Add(new Rectangle(
+                        (int)linear_tween((float)(wallhittimer-5) / 5f, hud_recs[i].X +10, hud_recs[i].X -10),
+                        (int)linear_tween((float)(wallhittimer-5) / 5f, hud_recs[i].Y + 10, hud_recs[i].Y -10),
+                        hud.middle_line[i].Width,hud.middle_line[i].Height));
+                }
+                hud.middle_line = r;
+            } 
+            else if (wallhit && wallhittimer < 15) {
+                List<Rectangle> r = new List<Rectangle>();
+                for (int i = 0; i < hud.middle_line.Count(); i++) {
+                    r.Add(new Rectangle(
+                        (int)linear_tween((float)(wallhittimer - 10) / 5f, hud_recs[i].X - 10, hud_recs[i].X),
+                        (int)linear_tween((float)(wallhittimer - 10) / 5f, hud_recs[i].Y - 10, hud_recs[i].Y),
+                        hud.middle_line[i].Width, hud.middle_line[i].Height));
+                }
+                hud.middle_line = r;
+            } 
+           
 
             //Paddle & ball scaling when hit
             if (p2hit & hittimer < 5) player2.scale = linear_tween((float)hittimer / 5f, 1, 1.5f);
@@ -146,7 +197,8 @@ namespace WongPong {
             else if ((p2hit || p1hit)) ball.scale = linear_tween((float)(hittimer -5) / 5f, 1.3f, 1f);
 
             //start of round, scale ball
-            if (roundtimer < 25) ball.scale = linear_tween((float)roundtimer / 25f, 10f, .15f);
+            if (roundtimer <= 1) { }
+            else if (roundtimer < 25) ball.scale = linear_tween((float)roundtimer / 25f, 10.5f, .15f);
             else if (roundtimer < 50) ball.scale = linear_tween((float)(roundtimer - 25) / 25f, .15f, 4f);
             else if (roundtimer < 75) ball.scale = linear_tween((float)(roundtimer - 50) / 25f, 4f, 1f);
             else pauseOn = false;

@@ -14,8 +14,9 @@ namespace WongPong {
         private string p1string, p2string;
         public Color textColor1,textColor2;
         public float scale1, scale2;
+        public Vector2 position1, position2;
         private Texture2D dummyTexture;
-        private List<Rectangle> middle_line;
+        public List<Rectangle> middle_line;
         private SpriteBatch spriteBatch;
         private SpriteFont spritefont;
 
@@ -26,7 +27,8 @@ namespace WongPong {
             //set primary attributes
             int rec_width = 8;
             int rec_height = 33;
-            
+            position1 = new Vector2(Defualt.Default._W * .25f, Defualt.Default._H * .05f);
+            position2 = new Vector2(Defualt.Default._W * .75f, Defualt.Default._H * .05f);
 
             //Set other attributes
             middle_line = new List<Rectangle>();
@@ -35,7 +37,8 @@ namespace WongPong {
             p1score = 0; p1string = "0";
             p2score = 0; p1string = "0";
             for (int i = 0; i < Defualt.Default._H; i += rec_height + rec_height / 3) {
-                middle_line.Add(new Rectangle(Defualt.Default._W/2 - rec_width / 2, i, rec_width, rec_height));
+                Rectangle r = new Rectangle(Defualt.Default._W / 2 - rec_width / 2, i, rec_width, rec_height);
+                middle_line.Add(r);
             }
         }
         
@@ -46,6 +49,7 @@ namespace WongPong {
             spriteBatch = new SpriteBatch(graphicsdevice);
             dummyTexture = new Texture2D(graphicsdevice, 1, 1);
             dummyTexture.SetData(new Color[] { Color.White });
+
            
         }
 
@@ -60,8 +64,8 @@ namespace WongPong {
         public void Draw() {
             spriteBatch.Begin();
             for (int i = 0; i < middle_line.Count(); i++) spriteBatch.Draw(dummyTexture, middle_line[i], Color.White);
-            spriteBatch.DrawString(spritefont, p1string, new Vector2(Defualt.Default._W * .25f, Defualt.Default._H * .05f), textColor1, 0f, new Vector2(0,0), scale1, SpriteEffects.None, 0f);
-            spriteBatch.DrawString(spritefont, p2string, new Vector2(Defualt.Default._W * .75f, Defualt.Default._H * .05f), textColor2, 0f, new Vector2(0, 0), scale2, SpriteEffects.None, 0f);
+            spriteBatch.DrawString(spritefont, p1string, position1, textColor1, 0f, new Vector2(0,0), scale1, SpriteEffects.None, 0f);
+            spriteBatch.DrawString(spritefont, p2string, position2, textColor2, 0f, new Vector2(0, 0), scale2, SpriteEffects.None, 0f);
             spriteBatch.End();
         }
 

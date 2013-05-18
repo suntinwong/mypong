@@ -78,10 +78,6 @@ namespace WongPong {
             position.X += velocity.X; position.Y += velocity.Y;
             boundingBox.X = (int)position.X; boundingBox.Y = (int)position.Y;
 
-            //Check wall coliisions and act accordingly
-            if (position.X > Defualt.Default._W - texture.Width || position.X < 0) { velocity.X *= -1; }
-            if (position.Y > Defualt.Default._H - texture.Height || position.Y < 0) { velocity.Y *= -1; PaddleHit(); }
-
             //set limits on the velocity
             if (velocity.X > maxVelocity.X) velocity.X = maxVelocity.X;
             else if (velocity.X < -1 * maxVelocity.X) velocity.X = -1 * maxVelocity.X;
@@ -111,7 +107,7 @@ namespace WongPong {
         }
 
         //Paddle hit, make particle effect
-        public void PaddleHit() {
+        public void PaddleHit(Color newcolor) {
 
             //Figure out if it was right or left paddle
             int xMax, xMin;
@@ -124,7 +120,7 @@ namespace WongPong {
                 Particle p = new Particle(particleTexture,
                     (int)position.X, (int)position.Y,
                     new Vector2(rand.Next(xMin,xMax) / 10f, rand.Next(-5, 5) / 10f),
-                    Color.White);
+                    newcolor);
                 p.life = -100;
                 particles.Add(p);
             }

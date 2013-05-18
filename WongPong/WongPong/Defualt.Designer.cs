@@ -25,7 +25,7 @@ namespace WongPong {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("800")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
         public int _W {
             get {
                 return ((int)(this["_W"]));
@@ -37,7 +37,7 @@ namespace WongPong {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        [global::System.Configuration.DefaultSettingValueAttribute("650")]
         public int _H {
             get {
                 return ((int)(this["_H"]));

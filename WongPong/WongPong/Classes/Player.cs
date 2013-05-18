@@ -19,6 +19,7 @@ namespace WongPong {
         public Rectangle boundingBox; //bounding box used for collision
         public int moveSpeed;        //Player's move max speed
         public int velocity;        //player's current velocity
+        public Color color;
         private int type;            //player's type # (player 1 or player 2?)
         public float rotationAngle;          //object's rotation
         public float scale;             //object's scale
@@ -26,10 +27,11 @@ namespace WongPong {
         private Kinect kinect;
 
         //Constructor
-        public Player(int newtype = 1) {
+        public Player(Color newcolor, int newtype = 1) {
 
             //set important attributes
             moveSpeed = 12;
+            color = newcolor;
 
             //other attributes
             velocity = 0;
@@ -45,8 +47,8 @@ namespace WongPong {
 
             //texture, set initial position & bounding box
             texture = content.Load<Texture2D>("Artwork/player");
-            if (type == 1) position = new Vector2(15, Defualt.Default._H / 2 - texture.Height / 2);
-            else if (type == 2) position = new Vector2(Defualt.Default._W - texture.Width - 15, Defualt.Default._H / 2 - texture.Height / 2);
+            if (type == 1) position = new Vector2(30, Defualt.Default._H / 2 - texture.Height / 2);
+            else if (type == 2) position = new Vector2(Defualt.Default._W - texture.Width - 30, Defualt.Default._H / 2 - texture.Height / 2);
             boundingBox = new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height);
             origin.X = (texture.Width / 2); origin.Y = (texture.Height / 2);
 
@@ -91,8 +93,10 @@ namespace WongPong {
 
         //draw method
         public void Draw(SpriteBatch spritebatch, bool hit = false) {
-            if (!hit) spritebatch.Draw(texture, position + origin, null, Color.Crimson, rotationAngle, origin, scale, SpriteEffects.None, 0f);
-            else spritebatch.Draw(texture, position + origin, null, Color.Gold, rotationAngle, origin, scale, SpriteEffects.None, 0f);
+            Color c = color;
+            if(hit) c = Color.Gold;
+
+            spritebatch.Draw(texture, position + origin, null, c, rotationAngle, origin, scale, SpriteEffects.None, 0f);
         }
     }
 }
