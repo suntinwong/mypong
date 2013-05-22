@@ -19,12 +19,10 @@ namespace WongPong {
         public Rectangle boundingBox; //bounding box used for collision
         public int moveSpeed;        //Player's move max speed
         public int velocity;        //player's current velocity
-        public Color color;
+        public Color color;         //the paddle's color
         private int type;            //player's type # (player 1 or player 2?)
         public float rotationAngle;          //object's rotation
         public float scale;             //object's scale
-
-        private Kinect kinect;
 
         //Constructor
         public Player(Color newcolor, int newtype = 1) {
@@ -38,7 +36,7 @@ namespace WongPong {
             type = newtype;
             rotationAngle = 0;
             scale = 1.0f;
-            kinect = new Kinect();  //Make kinect object
+            
             origin = new Vector2(0,0);
         }
 
@@ -52,15 +50,11 @@ namespace WongPong {
             boundingBox = new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height);
             origin.X = (texture.Width / 2); origin.Y = (texture.Height / 2);
 
-            //initialize kinect stuff if needed
-            if (Defualt.Default.UsingKinect) {
-                kinect = new Kinect();
-                kinect.initialize();
-            }
+            
         }
 
         //Update method
-        public void Update(GameTime gametime) {
+        public void Update(GameTime gametime,Skeleton player) {
 
             //update boundingBox & other thigns
             boundingBox.X = (int)position.X; boundingBox.Y = (int)position.Y;
@@ -81,7 +75,16 @@ namespace WongPong {
             else {
 
                 //when player isnt on the screen
-                if (kinect.player == null) return;
+                if (player == null) return;
+
+                //Make the paddle move to the player's position
+                Joint joint = player.Joints[JointType.HandRight];
+                Vector2 jointPosition = new Vector2(joint.Position.X, joint.Position.Y);
+                double handpos = Math.Abs((jointPosition.Y * 2) * (Defualt.Default._W) - Defualt.Default._H / 2);
+
+                //Figure out if we should move up or down
+                if (handpos > position.Y +moveSpeed) moveDown = true;
+                else if (handpos < position.Y -moveSpeed) moveUp = true;
             }
 
             //Move player if applicable & keep them on screen

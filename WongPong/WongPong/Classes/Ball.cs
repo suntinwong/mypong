@@ -31,7 +31,7 @@ namespace WongPong {
             maxParticleLife = 20;
             position = new Vector2(Defualt.Default._W / 10, Defualt.Default._H / 2);
             velocity = new Vector2(3.5f, 0);
-            maxVelocity = new Vector2(12, 12);
+            maxVelocity = new Vector2(20, 20);
             
             //set other stuff
             isVisible = true;
@@ -72,7 +72,7 @@ namespace WongPong {
                 (int)position.X + texture.Width / 2 + rand.Next(-4, 4),
                 (int)position.Y + texture.Width / 2 + rand.Next(-4, 4),
                 new Vector2(rand.Next(-150,150)/100f, rand.Next(-150, 150)/100f),
-                Color.Yellow ));
+                Color.Green ));
 
             //Move the ball && update bounding box, degrade X velocity
             position.X += velocity.X; position.Y += velocity.Y;
@@ -96,12 +96,15 @@ namespace WongPong {
         public void Draw(SpriteBatch spritebatch,bool hit) {
 
             //draw the ball & particles
-            Color c = Color.Gold;
+            Color c = Color.Green;
             if (hit) c = Color.White;
+            if ( Math.Abs(velocity.X) > 10) c = Color.Gold;
             if(isVisible) spritebatch.Draw(texture, position+origin, null, c,rotationAngle,origin, scale, SpriteEffects.None, 0f);
             for (int i = 0; i < particles.Count(); i++) {
-                if (!hit) particles[i].Draw(spritebatch, Color.Black);
-                else particles[i].Draw(spritebatch, Color.White,true);
+                if (particles[i].type != 0) particles[i].Draw(spritebatch, Color.Black);
+                else if (Math.Abs(velocity.X) > 10) particles[i].Draw(spritebatch, Color.Gold, true, 2f);
+                else if (hit) particles[i].Draw(spritebatch, Color.White, true);
+                else particles[i].Draw(spritebatch, Color.Black);
             }
             
         }
@@ -116,11 +119,11 @@ namespace WongPong {
 
             //make directional small explision
             Random rand = new Random();
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < 8; i++) {
                 Particle p = new Particle(particleTexture,
                     (int)position.X, (int)position.Y,
                     new Vector2(rand.Next(xMin,xMax) / 10f, rand.Next(-5, 5) / 10f),
-                    newcolor);
+                    newcolor,1);
                 p.life = -100;
                 particles.Add(p);
             }
@@ -146,7 +149,6 @@ namespace WongPong {
             velocity = new Vector2(0, 0);
             position = new Vector2(Defualt.Default._W / 2, Defualt.Default._H / 2);
             boundingBox.X = (int)position.X; boundingBox.Y = (int)position.Y;
-
         }
 
         //reset the ball

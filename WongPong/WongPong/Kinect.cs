@@ -19,6 +19,8 @@ namespace KinectTracking
         KinectSensor kinectSensor = null;
 
         public Skeleton player;
+        public Skeleton player2;
+        private bool p1tracked, p2tracked;
 
         Skeleton[] playerData;
 
@@ -81,12 +83,13 @@ namespace KinectTracking
             kinectSensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(kinectSkeletonFrameReadyCallback);
             kinectSensor.Start();
             kinectSensor.ElevationAngle = elevationAngle;
+
         }
 
         // Process skeleton data
         void kinectSkeletonFrameReadyCallback(object sender, SkeletonFrameReadyEventArgs skeletonFrames)
         {
-            // Open the skeleton
+            // Skeleton FRAME:  Open the skeleton
             using (SkeletonFrame skeleton = skeletonFrames.OpenSkeletonFrame())
             {
 
@@ -107,6 +110,8 @@ namespace KinectTracking
 
             if (playerData != null)
             {
+                p1tracked = false; p2tracked = false;
+
                 foreach (Skeleton skeleton in playerData)
                 {
                     // if a player is being tracked
@@ -116,7 +121,8 @@ namespace KinectTracking
                     //      if the kinect "sees" another player it could focus on them and not the Actual player
                     if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
                     {
-                        player = skeleton;
+                        if (!p1tracked) { player = skeleton; p1tracked = true; } 
+                        else if (!p2tracked) { player2 = skeleton; p2tracked = true; }
                     }
                 }
             }

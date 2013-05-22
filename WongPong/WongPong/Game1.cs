@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using Microsoft.Kinect;
+using KinectTracking;
 
 namespace WongPong {
   
@@ -30,6 +32,7 @@ namespace WongPong {
         bool p1JustScored = false;
         List<Rectangle> hud_recs = new List<Rectangle>();
         Vector2 hud_text1pos, hud_text2pos;
+        private Kinect kinect;
 
         //timers
         int hittimer = 0;
@@ -47,11 +50,17 @@ namespace WongPong {
             graphics.PreferredBackBufferWidth = Defualt.Default._W; //set the screen dimension width
             graphics.PreferredBackBufferHeight = Defualt.Default._H; //set the screen dimension height
             this.Window.Title = "WongPong"; //set window title
+            kinect = new Kinect();  //Make kinect object
         }
 
        //Initialize Function
         protected override void Initialize() {
 
+            //initialize kinect stuff if needed
+            if (Defualt.Default.UsingKinect) {
+                kinect = new Kinect();
+                kinect.initialize();
+            }
             base.Initialize();
         }
 
@@ -80,8 +89,8 @@ namespace WongPong {
         protected override void Update(GameTime gameTime) {
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed) this.Exit();
-            player1.Update(gameTime);    //update the player 1
-            player2.Update(gameTime);    //update player 2
+            player1.Update(gameTime,kinect.player);    //update the player 1
+            player2.Update(gameTime,kinect.player2);    //update player 2
             ball.Update(gameTime,Content,pauseOn);       //update the ball
             manage_collisions();         //do collision logic
             Score_Check();              //check & update scores
@@ -124,19 +133,24 @@ namespace WongPong {
             
             //ball collides with player #1
             if (ball.boundingBox.Intersects(player1.boundingBox)) {
-                ball.velocity.X  = rand.Next(6,12); ball.velocity.X += player1.velocity/3;
-                if (ball.velocity.Y > 0) ball.velocity.Y -= 2;
-                if (ball.velocity.Y < .25) ball.velocity.Y = rand.Next(-25, 25) / 10f;
-                ball.velocity.Y += player1.velocity / 3; ball.velocity.X += player1.velocity / 4;
+
+                ball.velocity.X  = rand.Next(6,10);
+                if (Math.Abs(ball.velocity.Y) > 0) ball.velocity.Y /= 3;
+                if (Math.Abs(ball.velocity.Y) < .25) ball.velocity.Y = rand.Next(-25, 25) / 10f;
+                ball.velocity.X += Math.Abs(player1.velocity); 
+                ball.velocity.Y += player1.velocity / 3; 
+
                 p1hit = true; ballhit = true; hittimer = 0; ball.PaddleHit(player1.color); 
             }
 
             //ball collides with player #2
             else if (ball.boundingBox.Intersects(player2.boundingBox)) {
-                ball.velocity.X = rand.Next(-12, -6); ball.velocity.X -= player2.velocity / 3;
-                if (ball.velocity.Y > 0) ball.velocity.Y /= 3;
-                if (ball.velocity.Y < .25) ball.velocity.Y = rand.Next(-15, 15) / 10f;
-                ball.velocity.Y += player2.velocity / 3; ball.velocity.X -= player2.velocity / 4;
+                ball.velocity.X = rand.Next(-10, -6); 
+                if (Math.Abs(ball.velocity.Y) > 0) ball.velocity.Y /= 3;
+                if (Math.Abs(ball.velocity.Y) < .25) ball.velocity.Y = rand.Next(-15, 15) / 10f;
+                ball.velocity.X -= Math.Abs(player2.velocity); 
+                ball.velocity.Y += player2.velocity / 3; 
+
                 p2hit = true; ballhit = true; hittimer = 0;  ball.PaddleHit(player2.color);
             }
 
