@@ -18,8 +18,8 @@ namespace WongPong {
         SpriteBatch spriteBatch;
 
         //Objects
-        Player player1 = new Player(Color.Red,1); //make player1
-        Player player2 = new Player(Color.Blue,2); //make player2
+        Player player1 = new Player(Color.Red,Color.IndianRed, 1); //make player1
+        Player player2 = new Player(Color.Blue,Color.CadetBlue,2); //make player2
         Ball ball = new Ball();         //make the ball
         HUD hud = new HUD();            //make the Huds up display
 
@@ -128,17 +128,22 @@ namespace WongPong {
             Random rand = new Random();
             if (p1hit && hittimer > 10) p1hit = false;
             if (p2hit && hittimer > 10) p2hit = false;
-            if (ballhit && hittimer > 10) ballhit = false;
+            if (ballhit && (hittimer > 10 || wallhittimer > 10)) ballhit = false;
             if (wallhit && wallhittimer > 15) wallhit = false;
             
             //ball collides with player #1
             if (ball.boundingBox.Intersects(player1.boundingBox)) {
 
                 ball.velocity.X  = rand.Next(6,10);
-                if (Math.Abs(ball.velocity.Y) > 0) ball.velocity.Y /= 3;
-                if (Math.Abs(ball.velocity.Y) < .25) ball.velocity.Y = rand.Next(-25, 25) / 10f;
-                ball.velocity.X += Math.Abs(player1.velocity); 
-                ball.velocity.Y += player1.velocity / 3; 
+                ball.velocity.Y = rand.Next(-20, 20) / 10f;
+                if (player1.velocity == 0) {
+                    ball.velocity.X += 12;
+                    ball.velocity.Y += rand.Next(-2, 2);
+                } 
+                else if (player1.velocity > 8 || player1.velocity < -8) {
+                    ball.velocity.Y = player1.velocity * .75f;
+                    ball.velocity.X += 3;
+                }
 
                 p1hit = true; ballhit = true; hittimer = 0; ball.PaddleHit(player1.color); 
             }
@@ -146,11 +151,15 @@ namespace WongPong {
             //ball collides with player #2
             else if (ball.boundingBox.Intersects(player2.boundingBox)) {
                 ball.velocity.X = rand.Next(-10, -6); 
-                if (Math.Abs(ball.velocity.Y) > 0) ball.velocity.Y /= 3;
-                if (Math.Abs(ball.velocity.Y) < .25) ball.velocity.Y = rand.Next(-15, 15) / 10f;
-                ball.velocity.X -= Math.Abs(player2.velocity); 
-                ball.velocity.Y += player2.velocity / 3; 
-
+                ball.velocity.Y = rand.Next(-20, 20) / 10f;
+                if (player2.velocity == 0) {
+                    ball.velocity.X -= 12;
+                    ball.velocity.Y += rand.Next(-4, 4);
+                }
+                else if (player2.velocity > 8 || player2.velocity < -8) {
+                    ball.velocity.Y = player2.velocity * .75f;
+                    ball.velocity.X -= 3;
+                }
                 p2hit = true; ballhit = true; hittimer = 0;  ball.PaddleHit(player2.color);
             }
 
@@ -160,12 +169,11 @@ namespace WongPong {
             else if (ball.position.Y > Defualt.Default._H - ball.texture.Height || ball.position.Y < 0) { 
                 ball.velocity.Y *= -1; 
                 ball.PaddleHit(Color.White);
-                wallhit = true;
-                wallhittimer = 0;
-            }
+                wallhit = true; ballhit = true;  wallhittimer = 0; 
+            } 
 
-            //ball doesnt collide with player
-            else {
+              //ball doesnt collide with player
+              else {
             }
         }
 
@@ -186,6 +194,7 @@ namespace WongPong {
                 hud.position1.Y = (int)linear_tween((float)wallhittimer / 5f, hud_text1pos.Y, hud_text1pos.Y + 10);
                 hud.position2.X = (int)linear_tween((float)wallhittimer / 5f, hud_text2pos.X, hud_text2pos.X + 10);
                 hud.position2.Y = (int)linear_tween((float)wallhittimer / 5f, hud_text2pos.Y, hud_text2pos.Y + 10);
+                ball.scale = linear_tween((float)wallhittimer / 5f, 1, 1.3f);
             }
             else if (wallhit && wallhittimer < 10) {
                 List<Rectangle> r = new List<Rectangle>();
@@ -200,6 +209,7 @@ namespace WongPong {
                 hud.position1.Y = (int)linear_tween((float)(wallhittimer-5) / 5f, hud_text1pos.Y+10, hud_text1pos.Y-10);
                 hud.position2.X = (int)linear_tween((float)(wallhittimer-5) / 5f, hud_text2pos.X+10, hud_text2pos.X-10);
                 hud.position2.Y = (int)linear_tween((float)(wallhittimer-5) / 5f, hud_text2pos.Y+10, hud_text2pos.Y-10);
+                ball.scale = linear_tween((float)(wallhittimer - 5) / 5f, 1.3f, 1f);
             } 
             else if (wallhit && wallhittimer < 15) {
                 List<Rectangle> r = new List<Rectangle>();

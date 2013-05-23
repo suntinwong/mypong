@@ -31,7 +31,7 @@ namespace WongPong {
             maxParticleLife = 20;
             position = new Vector2(Defualt.Default._W / 10, Defualt.Default._H / 2);
             velocity = new Vector2(3.5f, 0);
-            maxVelocity = new Vector2(20, 20);
+            maxVelocity = new Vector2(22, 22);
             
             //set other stuff
             isVisible = true;
@@ -97,13 +97,15 @@ namespace WongPong {
 
             //draw the ball & particles
             Color c = Color.Green;
-            if (hit) c = Color.White;
             if ( Math.Abs(velocity.X) > 10) c = Color.Gold;
+            if (Math.Abs(velocity.Y) > 4) c = Color.YellowGreen;
+            if (hit) c = Color.White;
             if(isVisible) spritebatch.Draw(texture, position+origin, null, c,rotationAngle,origin, scale, SpriteEffects.None, 0f);
             for (int i = 0; i < particles.Count(); i++) {
                 if (particles[i].type != 0) particles[i].Draw(spritebatch, Color.Black);
-                else if (Math.Abs(velocity.X) > 10) particles[i].Draw(spritebatch, Color.Gold, true, 2f);
-                else if (hit) particles[i].Draw(spritebatch, Color.White, true);
+                else if (Math.Abs(velocity.X) > 10) particles[i].Draw(spritebatch, c, true, 2f);
+                if (Math.Abs(velocity.Y) > 4) particles[i].Draw(spritebatch, c, true, 1.3f);
+                else if (hit) particles[i].Draw(spritebatch, c, true);
                 else particles[i].Draw(spritebatch, Color.Black);
             }
             

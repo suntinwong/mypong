@@ -18,24 +18,27 @@ namespace WongPong {
         public Vector2 position, origin;   //position & center of Player in the game world
         public Rectangle boundingBox; //bounding box used for collision
         public int moveSpeed;        //Player's move max speed
-        public int velocity;        //player's current velocity
+        public float velocity;        //player's current velocity
         public Color color;         //the paddle's color
+        public Color color2;
         private int type;            //player's type # (player 1 or player 2?)
         public float rotationAngle;          //object's rotation
         public float scale;             //object's scale
 
         //Constructor
-        public Player(Color newcolor, int newtype = 1) {
+        public Player(Color newcolor, Color newcolor2, int newtype = 1) {
 
-            //set important attributes
-            moveSpeed = 12;
+            //set important attibutes
+            moveSpeed = 20;
             color = newcolor;
+            color2 = newcolor2;
 
             //other attributes
             velocity = 0;
             type = newtype;
             rotationAngle = 0;
             scale = 1.0f;
+            
             
             origin = new Vector2(0,0);
         }
@@ -58,17 +61,30 @@ namespace WongPong {
 
             //update boundingBox & other thigns
             boundingBox.X = (int)position.X; boundingBox.Y = (int)position.Y;
-            bool moveUp = false;
-            bool moveDown = false;
-            velocity = 0;
+            if(velocity > 0) velocity -= .5f;
+            if (velocity < 0) velocity += .5f;
 
             //When we're using mice and keyboard (no kinect controls)
             if (!Defualt.Default.UsingKinect) {
+
+
+                int threshold = 10;
                 KeyboardState keystate = Keyboard.GetState();
-                if (type == 1 && keystate.IsKeyDown(Keys.W)) moveUp = true;
-                if (type == 1 && keystate.IsKeyDown(Keys.S)) moveDown = true;
-                if (type == 2 && keystate.IsKeyDown(Keys.Up)) moveUp = true;
-                if (type == 2 && keystate.IsKeyDown(Keys.Down)) moveDown = true;
+                if (type == 1 && keystate.IsKeyDown(Keys.W)) { position.Y -= moveSpeed; velocity = threshold * -1; }
+                if (type == 1 && keystate.IsKeyDown(Keys.S)) { position.Y += moveSpeed; velocity = threshold; }
+                if (type == 2 && keystate.IsKeyDown(Keys.Up)) { position.Y -= moveSpeed; velocity = threshold * -1; }
+                if (type == 2 && keystate.IsKeyDown(Keys.Down)) { position.Y += moveSpeed; velocity = threshold; }
+
+                /*
+                //Mouse input
+                MouseState mousestate = Mouse.GetState();
+                Vector2 jointPosition = new Vector2(mousestate.X, mousestate.Y);
+                double handpos = Math.Abs((jointPosition.Y * 2));
+                if (handpos > position.Y + threshold) { position.Y = (float)handpos; velocity = threshold * -1; }
+                else if (handpos < position.Y -threshold ) { position.Y = (float)handpos; velocity = threshold; }
+                */
+
+                
             }
 
             //When kinect is enabled (only use kinect controls)
@@ -76,6 +92,7 @@ namespace WongPong {
 
                 //when player isnt on the screen
                 if (player == null) return;
+                int threshold = 10;
 
                 //Make the paddle move to the player's position
                 Joint joint = player.Joints[JointType.HandRight];
@@ -83,13 +100,11 @@ namespace WongPong {
                 double handpos = Math.Abs((jointPosition.Y * 2) * (Defualt.Default._W) - Defualt.Default._H / 2);
 
                 //Figure out if we should move up or down
-                if (handpos > position.Y +moveSpeed) moveDown = true;
-                else if (handpos < position.Y -moveSpeed) moveUp = true;
+                if (handpos > position.Y + threshold) { position.Y = (float)handpos; velocity = threshold * -1; }
+                else if (handpos < position.Y -threshold ) { position.Y = (float)handpos; velocity = threshold; }
             }
 
             //Move player if applicable & keep them on screen
-            if (moveUp) { position.Y -= moveSpeed; velocity = moveSpeed * -1; }
-            if (moveDown) { position.Y += moveSpeed; velocity = moveSpeed; }
             if (position.Y <= 0) position.Y = 0;
             if (position.Y >= Defualt.Default._H - texture.Height) position.Y = Defualt.Default._H - texture.Height;
         }
@@ -97,8 +112,8 @@ namespace WongPong {
         //draw method
         public void Draw(SpriteBatch spritebatch, bool hit = false) {
             Color c = color;
-            if(hit) c = Color.Gold;
-
+            if (hit) c = Color.Gold;
+            else if (velocity != 0) c = color2;
             spritebatch.Draw(texture, position + origin, null, c, rotationAngle, origin, scale, SpriteEffects.None, 0f);
         }
     }

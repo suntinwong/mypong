@@ -34,8 +34,6 @@ namespace WongPong {
             Random rand = new Random();
             rotationAngle = rand.Next(0, 360);
             life = 0;
-
-            
         }
 
         //Update method
